@@ -9,6 +9,8 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import barley.Barley;
+import barley.BarleyApp;
+import barley.JettyServer;
 import barley.Util;
 
 public class Main {
@@ -17,6 +19,14 @@ public class Main {
 	public static final Writer output;
 
 	public static void main(String[] args) {
+
+		try {
+			BarleyApp app = new BarleyApp();
+			JettyServer server = new JettyServer(app);
+			server.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		Barley.get("/hello",
 			Util.loadJson("/test.json"),

@@ -18,19 +18,6 @@ import java.util.Map.Entry;
 
 public class Barley {
 
-	private static final List<Mapping> MAPPINGS = new ArrayList<Mapping>();
-
-	protected static class Mapping {
-		public Mapping( String path, JsonSchema schema, Route handler) {
-			this.path = path;
-			this.schema = schema;
-			this.handler = handler;
-		}
-		public String path;
-		public JsonSchema schema;
-		public Route handler;
-	}
-
 	public static void get(String path, JsonNode validator, Route handler) {
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
 		final JsonSchema schema;
@@ -39,8 +26,6 @@ public class Barley {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		Mapping mapping = new Mapping(path, schema, handler);
-		MAPPINGS.add(mapping);
 		Spark.get(path, (req, res) -> {
 			Map<String, String> params = req.params();
 			JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
