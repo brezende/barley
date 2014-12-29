@@ -1,9 +1,15 @@
 package barley;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,8 +55,13 @@ public class BarleyApp {
 			return;
 		}
 
-		Object handlerResponse = endpoint.handler.handle(request, response);
+		ProcessingReport report = validate(request, endpoint.schema);
+		if(!report.isSuccess()) {
+			renderResponse(report, response);
+			return;
+		}
 
+		Object handlerResponse = endpoint.handler.handle(request, response);
 		renderResponse(handlerResponse, response);
 	}
 
@@ -67,6 +78,20 @@ public class BarleyApp {
 		//XXX Debug
 		System.out.println("no match " + target);
 		return null;
+	}
+
+	protected ProcessingReport validate(HttpServletRequest request, JsonSchema schema) {
+		try {
+			Map<String, String[]> params = request.getParameterMap();
+			JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
+			ObjectNode inputJson = nodeFactory.objectNode();
+			for(Entry<String, String[]> param: params.entrySet()) {
+				inputJson.put(param.getKey(), param.getValue()[0]);
+			}
+			return schema.validate(inputJson);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void renderResponse(Object handlerResponse, HttpServletResponse response) {
