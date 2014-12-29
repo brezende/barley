@@ -12,16 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 
+import org.springframework.web.util.UriTemplate;
+
 public class BarleyApp {
 	private List<Endpoint> endpoints;
 
 	public static class Endpoint {
 		public Endpoint(String path, JsonSchema schema, Route handler) {
-			this.path = path;
+			this.path = new UriTemplate(path);
 			this.schema = schema;
 			this.handler = handler;
 		}
-		public String path;
+		public UriTemplate path;
 		public JsonSchema schema;
 		public Route handler;
 	}
@@ -43,6 +45,13 @@ public class BarleyApp {
 			Request baseRequest,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		System.out.println(target);
+		for(Endpoint endpoint: endpoints) {
+			System.out.println("trying to match " + endpoint.path + " with " + target);
+			if(endpoint.path.matches(target)) {
+				System.out.println("match " + target);
+				return;
+			}
+		}
+		System.out.println("no match " + target);
 	}
 }

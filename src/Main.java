@@ -20,20 +20,20 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		try {
-			BarleyApp app = new BarleyApp();
-			JettyServer server = new JettyServer(app);
-			server.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		Barley.get("/hello",
 			Util.loadJson("/test.json"),
 			(req, res) -> {
 				eventQueue.add("hello");
 				return "ok";
 			});
+
+		try {
+			BarleyApp app = Barley.app;
+			JettyServer server = new JettyServer(app);
+			server.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		new Thread(() -> {
 			while(true) {
