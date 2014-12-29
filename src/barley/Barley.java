@@ -1,8 +1,5 @@
 package barley;
 
-import spark.Spark;
-import spark.Route;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -20,7 +17,7 @@ public class Barley {
 
 	public static final BarleyApp app = new BarleyApp();
 
-	public static void get(String path, JsonNode validator, Route handler) {
+	public static void get(String path, JsonNode validator, IEndpointHandler handler) {
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
 		final JsonSchema schema;
 		try {
@@ -29,19 +26,19 @@ public class Barley {
 			throw new RuntimeException(e);
 		}
 		app.addEndpoint(path, schema, handler);
-		Spark.get(path, (req, res) -> {
-			Map<String, String> params = req.params();
-			JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-			ObjectNode inputJson = nodeFactory.objectNode();
-			for(Entry<String, String> param: params.entrySet()) {
-				inputJson.put(param.getKey(), param.getValue());
-			}
-			ProcessingReport report = schema.validate(inputJson);
-			if(!report.isSuccess()) {
-				System.out.println(report);
-				return report;
-			}
-			return handler.handle(req, res);
-		});
+		//Spark.get(path, (req, res) -> {
+		//	Map<String, String> params = req.params();
+		//	JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
+		//	ObjectNode inputJson = nodeFactory.objectNode();
+		//	for(Entry<String, String> param: params.entrySet()) {
+		//		inputJson.put(param.getKey(), param.getValue());
+		//	}
+		//	ProcessingReport report = schema.validate(inputJson);
+		//	if(!report.isSuccess()) {
+		//		System.out.println(report);
+		//		return report;
+		//	}
+		//	return handler.handle(req, res);
+		//});
 	}
 }
