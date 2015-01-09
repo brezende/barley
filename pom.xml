@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>BN</groupId>
-	<artifactId>spark-test</artifactId>
+	<artifactId>Barley</artifactId>
 	<version>1.0</version>
 
 	<dependencies>
