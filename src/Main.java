@@ -10,8 +10,8 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import barley.Barley;
 import barley.BarleyApp;
-import barley.JettyServer;
 import barley.Util;
+import barley.http.JettyServer;
 
 public class Main {
 
@@ -21,7 +21,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		Barley.get("/hello",
-			Util.loadJson("/test.json"),
+			"/test.json",
 			(req, res) -> {
 				eventQueue.add("hello");
 				return "ok";

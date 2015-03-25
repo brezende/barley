@@ -1,32 +1,29 @@
 package barley;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Request;
-
+import org.eclipse.jetty.http.HttpMethod;
 import org.springframework.web.util.UriTemplate;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
 
 public class BarleyApp {
 	private List<Endpoint> endpoints;
 
 	public static class Endpoint {
-		public Endpoint(String path, JsonSchema schema, IEndpointHandler handler) {
+		public Endpoint(HttpMethod method, String path, JsonSchema schema, IEndpointHandler handler) {
+			this.method = method;
 			this.path = new UriTemplate(path);
 			this.schema = schema;
 			this.handler = handler;
 		}
+		public HttpMethod method;
 		public UriTemplate path;
 		public JsonSchema schema;
 		public IEndpointHandler handler;
@@ -36,8 +33,8 @@ public class BarleyApp {
 		endpoints = new ArrayList<Endpoint>();
 	}
 
-	public void addEndpoint(String path, JsonSchema schema, IEndpointHandler handler) {
-		Endpoint endpoint = new Endpoint(path, schema, handler);
+	public void addEndpoint(HttpMethod method, String path, JsonSchema schema, IEndpointHandler handler) {
+		Endpoint endpoint = new Endpoint(method, path, schema, handler);
 		addEndpoint(endpoint);
 	}
 
@@ -46,30 +43,34 @@ public class BarleyApp {
 	}
 
 	public void handle(String target,
-			Request baseRequest,
-			HttpServletRequest request,
-			HttpServletResponse response) {
-		Endpoint endpoint = getMatchingEndpoint(target);
+			RawRequest rawRequest,
+			Response response) {
+		HttpMethod method = rawRequest.getMethod();
+		Endpoint endpoint = getMatchingEndpoint(method, target);
 		if(endpoint == null) {
 			//XXX return a 404 or something
 			return;
 		}
 
-		ProcessingReport report = validate(request, endpoint.schema);
-		if(!report.isSuccess()) {
-			renderResponse(report, response);
-			return;
+		Request request = new EndpointRequestWrapper(endpoint, target, rawRequest);
+		
+		if (endpoint.schema != null) {
+			ProcessingReport report = validate(request, endpoint.schema);
+			if(!report.isSuccess()) {
+				renderResponse(report, response);
+				return;
+			}
 		}
 
 		Object handlerResponse = endpoint.handler.handle(request, response);
 		renderResponse(handlerResponse, response);
 	}
 
-	protected Endpoint getMatchingEndpoint(String target) {
+	protected Endpoint getMatchingEndpoint(HttpMethod method, String target) {
 		for(Endpoint endpoint: endpoints) {
 			//XXX Debug
 			System.out.println("trying to match " + endpoint.path + " with " + target);
-			if(endpoint.path.matches(target)) {
+			if(endpoint.method.equals(method) && endpoint.path.matches(target)) {
 				//XXX Debug
 				System.out.println("match " + target);
 				return endpoint;
@@ -80,9 +81,9 @@ public class BarleyApp {
 		return null;
 	}
 
-	protected ProcessingReport validate(HttpServletRequest request, JsonSchema schema) {
+	protected ProcessingReport validate(Request request, JsonSchema schema) {
 		try {
-			Map<String, String[]> params = request.getParameterMap();
+			Map<String, String[]> params = request.getQueryParams();
 			JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
 			ObjectNode inputJson = nodeFactory.objectNode();
 			for(Entry<String, String[]> param: params.entrySet()) {
@@ -94,14 +95,14 @@ public class BarleyApp {
 		}
 	}
 
-	protected void renderResponse(Object handlerResponse, HttpServletResponse response) {
+	protected void renderResponse(Object handlerResponse, Response response) {
 		String handlerResponseAsStr = null;
 		if(handlerResponse != null) {
 			handlerResponseAsStr = handlerResponse.toString();
 		}
 		if(handlerResponseAsStr != null) {
 			try {
-				response.getOutputStream().write(handlerResponseAsStr.getBytes("utf-8"));
+				response.setBody(handlerResponseAsStr);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

@@ -1,9 +1,10 @@
-package barley;
+package barley.http;
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+
+import barley.BarleyApp;
 
 public class JettyServer {
 	private BarleyApp app;
