@@ -1,27 +1,27 @@
 package barley.http;
 
-import org.eclipse.jetty.server.Handler;
+import java.util.Map;
+
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.xml.XmlConfiguration;
 
 import barley.BarleyApp;
 
 public class JettyServer {
-	private BarleyApp app;
 	private Server server;
 
 	public JettyServer(BarleyApp app) {
-		Server server = new Server();
-
-		ServerConnector http = new ServerConnector(server);
-		http.setPort(8080);
-		server.addConnector(http);
-
-		Handler handler = new JettyHandler(app);
-		server.setHandler(handler);
-
-		this.app = app;
-		this.server = server;
+    	try {
+			Resource confXML = Resource.newSystemResource("jetty.xml");
+			XmlConfiguration configuration = new XmlConfiguration(
+					confXML.getInputStream());
+			Map<String, Object> idMap = configuration.getIdMap();
+			idMap.put("barleyApp", app);
+			server = (Server) configuration.configure();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void start() throws Exception {
