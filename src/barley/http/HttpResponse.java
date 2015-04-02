@@ -8,6 +8,7 @@ import barley.Response;
 public class HttpResponse implements Response {
 
 	private HttpServletResponse response;
+	private String body;
 	
 	public HttpResponse(HttpServletResponse response) {
 		this.response = response;
@@ -22,6 +23,11 @@ public class HttpResponse implements Response {
 	}
 
 	public void setBody(String body) {
+		this.body = body;
+	}
+	
+	public String getBody() {
+		return this.body;
 	}
 
 	public void setHeader(String header, String value) {

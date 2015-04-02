@@ -34,7 +34,7 @@
 						</Array>
 					</Arg>
 					<Set name="port">
-						<SystemProperty name="http_port" default="80" />
+						<SystemProperty name="http_port" default="8080" />
 					</Set>
 				</New>
 			</Item>

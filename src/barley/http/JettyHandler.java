@@ -10,8 +10,6 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import barley.BarleyApp;
-import barley.RawRequest;
-import barley.Response;
 
 public class JettyHandler extends AbstractHandler {
 	private BarleyApp app;
@@ -22,9 +20,13 @@ public class JettyHandler extends AbstractHandler {
 
 	public void handle(String target, Request baseRequest, HttpServletRequest httpRequest, HttpServletResponse httpResponse)
 				throws IOException, ServletException {
-		RawRequest request = new HttpRequest(httpRequest);
-		Response response = new HttpResponse(httpResponse);
+		HttpRequest request = new HttpRequest(httpRequest);
+		HttpResponse response = new HttpResponse(httpResponse);
 		app.handle(target, request, response);
+		String responseBody = response.getBody();
+		if(responseBody != null) {
+			httpResponse.getOutputStream().write(responseBody.getBytes("utf-8"));
+		}
 		baseRequest.setHandled(true);
 	}
 
