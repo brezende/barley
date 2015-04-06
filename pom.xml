@@ -46,7 +46,13 @@
 			<artifactId>cglib-nodep</artifactId>
 			<version>2.2</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -135,7 +141,7 @@
 				<configuration>
 					<useFile>false</useFile>
 					<includes>
-						<include>**/*Spec.java</include>
+						<include>**/*Spec.*</include>
 						<include>**/Test*.java</include>
 					</includes>
 				</configuration>

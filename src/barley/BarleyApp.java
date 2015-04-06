@@ -12,8 +12,10 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
+import com.google.gson.Gson;
 
 public class BarleyApp {
+	private static final Gson GSON = new Gson();
 	private List<Endpoint> endpoints;
 
 	public static class Endpoint {
@@ -61,7 +63,7 @@ public class BarleyApp {
 				return;
 			}
 		}
-
+		response.setStatus(200);
 		Object handlerResponse = endpoint.handler.handle(request, response);
 		renderResponse(handlerResponse, response);
 	}
@@ -98,7 +100,8 @@ public class BarleyApp {
 	protected void renderResponse(Object handlerResponse, Response response) {
 		String handlerResponseAsStr = null;
 		if(handlerResponse != null) {
-			handlerResponseAsStr = handlerResponse.toString();
+			handlerResponseAsStr = handlerResponse instanceof String ? (String) handlerResponse
+					: GSON.toJson(handlerResponse);
 		}
 		if(handlerResponseAsStr != null) {
 			try {

@@ -16,5 +16,9 @@ public interface RawRequest {
 
 	String getBody();
 	
+	Map<String, String> getHeaders();
+	
+	Map<String, String> getCookies();
+	
 	HttpMethod getMethod();
 }

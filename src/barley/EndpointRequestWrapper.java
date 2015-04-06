@@ -47,6 +47,16 @@ public class EndpointRequestWrapper implements Request {
 	}
 
 	@Override
+	public Map<String, String> getHeaders() {
+		return this.request.getHeaders();
+	}
+
+	@Override
+	public Map<String, String> getCookies() {
+		return this.request.getCookies();
+	}
+
+	@Override
 	public Map<String, String> getPathParams() {
 		if (this.pathParams == null) {
 			this.pathParams = this.endpoint.path.match(this.target);
