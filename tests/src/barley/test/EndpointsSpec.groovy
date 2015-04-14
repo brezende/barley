@@ -1,14 +1,14 @@
 package barley.test
 
-import groovy.json.JsonSlurper;
+import groovy.json.JsonSlurper
 
-import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpMethod
 
-import barley.BarleyApp;
-import barley.test.utils.EchoEndpoint;
-import barley.test.utils.RequestMock;
-import barley.test.utils.ResponseMock;
-import spock.lang.Specification;
+import spock.lang.Specification
+import barley.BarleyApp
+import barley.test.utils.EchoEndpoint
+import barley.test.utils.RequestMock
+import barley.test.utils.ResponseMock
 
 class EndpointsSpec extends Specification {
 		
@@ -17,7 +17,7 @@ class EndpointsSpec extends Specification {
 		
 		def setupSpec() {
 			app = new BarleyApp()
-			app.addEndpoint(HttpMethod.GET, "/echo/{param1}/stuff/{param2}/morestuff/{param3}", null, new EchoEndpoint())
+			app.addEndpoint(HttpMethod.GET, "/echo/{param1}/stuff/{param2}/morestuff/{param3}", "/test.json", new EchoEndpoint())
 		}
 	
 		def "Send get request with cookies, headers and query string params"() {
@@ -27,7 +27,7 @@ class EndpointsSpec extends Specification {
 			def param3 = '123'
 			def param4 = 'xyz'
 			def param5 = '456'
-			def body = "My body my rules, so here are some UTF-8 chars: áéãç####"
+			def body = '{"msg": "My body my rules, so here are some UTF-8 chars: áéãç####"}'
 			def uri = "/echo/${param1}/stuff/${param2}/morestuff/${param3}"
 			def method = HttpMethod.GET
 			def request = new RequestMock();
@@ -35,8 +35,8 @@ class EndpointsSpec extends Specification {
 			request.method = method
 			request.body = body
 			request.queryParams = [
-				'param4': [param4,param4],
-				'param5': [param5]
+				'param4': [param4,param4] as String[],
+				'param5': [param5] as String[]
 			]
 			def response = new ResponseMock();
 

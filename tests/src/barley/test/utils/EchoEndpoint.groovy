@@ -1,10 +1,10 @@
 package barley.test.utils
 
-import barley.IEndpointHandler;
+import barley.EndpointHandler;
 import barley.Request;
 import barley.Response;
 
-public class EchoEndpoint implements IEndpointHandler {
+public class EchoEndpoint extends EndpointHandler {
 
 	@Override
 	public Object handle(Request request, Response response) {

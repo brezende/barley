@@ -29,4 +29,8 @@ public class JettyServer {
 		this.server.join();
 	}
 
+	public void stop() throws Exception {
+		this.server.stop();
+	}
+
 }
